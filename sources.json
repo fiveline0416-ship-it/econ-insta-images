@@ -1,0 +1,8 @@
+[
+  {
+    "name": "한국은행 BOK 이슈노트",
+    "list_url": "https://www.bok.or.kr/portal/singl/newsData/listCont.do?pageIndex=1&targetDepth=3&menuNo=200433&syncMenuChekKey=1&searchCnd=1&searchKwd=&depth2=201156&depth3=200433",
+    "base_url": "https://www.bok.or.kr",
+    "link_contains": "P0002353/view.do"
+  }
+]
