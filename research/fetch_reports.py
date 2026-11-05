@@ -47,16 +47,19 @@ def parse_list(html, source):
             continue
         url = urljoin(source["base_url"] + "/portal/bbs/", href)
         key = item_key(url)
+        q = parse_qs(urlparse(url).query)
+        if "nttId" in q:  # 긴 주소를 짧게 정리
+            menu = q.get("menuNo", [""])[0]
+            url = url.split("?")[0] + f"?nttId={q['nttId'][0]}" + (f"&menuNo={menu}" if menu else "")
         if key in keys:
             continue
         keys.add(key)
         # 날짜는 링크를 감싼 줄(li/tr/div)에서 찾는다
         date = ""
-        box = a.find_parent(["li", "tr", "div"])
-        if box:
-            m = DATE_RE.search(box.get_text(" ", strip=True))
-            if m:
-                date = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+        box = a.find_parent(["li", "tr"]) or a.parent
+        m = DATE_RE.search(box.get_text(" ", strip=True)) if box else None
+        if m:
+            date = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
         found.append({"key": key, "title": title, "url": url, "date": date})
     return found
 
