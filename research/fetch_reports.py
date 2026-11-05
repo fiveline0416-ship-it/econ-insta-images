@@ -73,16 +73,29 @@ def main():
 
     for src in sources:
         try:
-            r = requests.get(src["list_url"], headers=HEADERS, timeout=30)
+            s = requests.Session()
+            s.headers.update(HEADERS)
+            # 사람이 들어가는 것처럼 첫 화면을 한 번 열어 쿠키를 받은 뒤 목록을 요청
+            s.get(src["base_url"] + "/portal/main/main.do", timeout=30)
+            r = s.get(src["list_url"], timeout=30, headers={
+                "Referer": src["base_url"] + "/portal/singl/newsData/list.do?menuNo=200433",
+                "X-Requested-With": "XMLHttpRequest",
+            })
             r.raise_for_status()
-            r.encoding = r.apparent_encoding or "utf-8"
+            r.encoding = "utf-8"
             items = parse_list(r.text, src)
         except Exception as e:  # 한 기관이 실패해도 나머지는 계속
             problems.append(f"{src['name']}: {e}")
             continue
 
         if not items:
-            problems.append(f"{src['name']}: 목록에서 보고서를 하나도 못 찾음 (사이트 구조 변경 가능성)")
+            # 원인 파악용 진단 정보
+            body = " ".join(r.text.split())
+            print("── 진단 ──")
+            print("요청 주소:", src["list_url"])
+            print("응답 코드:", r.status_code, "/ 길이:", len(r.text), "/ 최종 주소:", r.url)
+            print("앞부분:", body[:600])
+            problems.append(f"{src['name']}: 목록에서 보고서를 하나도 못 찾음")
             continue
 
         bucket = seen.setdefault(src["name"], [])
