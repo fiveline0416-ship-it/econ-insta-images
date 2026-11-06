@@ -30,12 +30,20 @@ jobs:
 
       - name: 결과 저장 (커밋 & 푸시)
         run: |
-          git config user.name "econ-1min-research-bot"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # 깃허브 공식 봇 이름표 (번호까지 정확히 적어야 함)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add research/reports.md research/seen.json
           if git diff --cached --quiet; then
             echo "새 보고서 없음"
-          else
-            git commit -m "리서치팀: $(TZ=Asia/Seoul date +%Y-%m-%d) 보고서 목록 업데이트"
-            git push
+            exit 0
           fi
+          git commit -m "리서치팀: $(TZ=Asia/Seoul date +%Y-%m-%d) 보고서 목록 업데이트"
+          # 깃허브가 일시 오류를 내면 최대 3번까지 다시 시도
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "저장 실패, ${i}번째 재시도 준비..."
+            sleep $((i * 10))
+            git pull --rebase origin main || true
+          done
+          exit 1
