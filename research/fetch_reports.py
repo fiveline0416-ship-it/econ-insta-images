@@ -20,6 +20,47 @@ REPORTS = HERE / "reports.md"      # 사람이 보는 목록
 KST = timezone(timedelta(hours=9))
 DATE_RE = re.compile(r"(20\d{2})[.\-/]\s?(\d{1,2})[.\-/]\s?(\d{1,2})")
 HEADERS = {"User-Agent": "Mozilla/5.0 (econ-1min research bot)"}
+DOCS = HERE / "docs"               # 보고서별 원문 요약 + PDF 본문 (편집팀이 읽음)
+DOCS_PER_RUN = 5                   # 한 번에 새로 받아올 원문 수 (서버 부담 줄이기)
+PDF_MAX_CHARS = 40000
+
+
+def save_doc(session, src, item):
+    """보고서 상세 페이지의 요약문과 PDF 본문을 docs/<번호>.md 로 저장."""
+    from io import BytesIO
+    r = session.get(item["url"], timeout=30)
+    r.raise_for_status()
+    r.encoding = "utf-8"
+    soup = BeautifulSoup(r.text, "html.parser")
+    box = soup.select_one(".dbdata")
+    summary = ""
+    if box:
+        paras = [" ".join(p.get_text(" ", strip=True).split()) for p in box.find_all("p")]
+        summary = "\n\n".join(p for p in paras if p)
+    pdf_url, pdf_text = "", ""
+    for a in soup.find_all("a", href=True):
+        if a["href"].lower().endswith(".pdf") and "/fileSrc/" in a["href"]:
+            pdf_url = urljoin(src["base_url"], a["href"])
+            break
+    if pdf_url:
+        try:
+            from pypdf import PdfReader
+            pr = session.get(pdf_url, timeout=60)
+            pr.raise_for_status()
+            reader = PdfReader(BytesIO(pr.content))
+            pages = []
+            for i, page in enumerate(reader.pages, 1):
+                pages.append(f"--- p.{i} ---\n" + (page.extract_text() or "").strip())
+            pdf_text = "\n\n".join(pages)[:PDF_MAX_CHARS]
+        except Exception as e:
+            pdf_text = f"(PDF 본문 추출 실패: {e})"
+    DOCS.mkdir(exist_ok=True)
+    (DOCS / f"{item['key']}.md").write_text(
+        f"# {item['title']}\n\n"
+        f"- 기관: {src['name']}\n- 발간일: {item['date']}\n- 상세: {item['url']}\n- PDF: {pdf_url or '없음'}\n\n"
+        f"## 한국은행 요약문\n\n{summary or '(요약문 없음)'}\n\n"
+        f"## PDF 본문 (앞부분 최대 {PDF_MAX_CHARS:,}자)\n\n{pdf_text or '(없음)'}\n",
+        encoding="utf-8")
 
 
 def load_json(path, default):
@@ -106,6 +147,18 @@ def main():
             date = it["date"] or today
             safe = it["title"].replace("|", "/").replace("[", "\\[").replace("]", "\\]")
             new_lines.append(f"| {date} | {src['name']} | [{safe}]({it['url']}) | 대기 |")
+
+        # 원문(요약문·PDF) 아직 안 받은 보고서는 최신순으로 몇 건씩 받아두기
+        fetched = 0
+        for it in items:
+            if fetched >= DOCS_PER_RUN or (DOCS / f"{it['key']}.md").exists():
+                continue
+            try:
+                save_doc(s, src, it)
+                fetched += 1
+                print(f"📄 원문 저장: {it['title']}")
+            except Exception as e:
+                print(f"⚠️ 원문 저장 실패 ({it['title']}): {e}")
 
     SEEN.write_text(json.dumps(seen, ensure_ascii=False, indent=2), encoding="utf-8")
 
