@@ -182,6 +182,8 @@ def main():
     if not BOT:
         print("TELEGRAM_BOT_TOKEN 비밀값이 없어서 텔레그램 결재를 건너뛰어요.")
         return
+    me = tg("getMe")
+    print(f"🤖 연결된 봇: @{me.get('username')} ({me.get('first_name')})")
     cfg = poll()
     chat_id = cfg.get("chat_id")
     if not chat_id:
