@@ -69,10 +69,11 @@ def send_request(folder: Path, chat_id):
     title = post.get("title", folder.name)
     handles = [open(p, "rb") for p in images]
     try:
-        media = [{"type": "photo", "media": f"attach://p{i}"} for i in range(len(images))]
-        media[0]["caption"] = f"🖼 {title}"
-        tg("sendMediaGroup", chat_id=chat_id, media=media,
-           files={f"p{i}": (p.name, h, "image/jpeg") for i, (p, h) in enumerate(zip(images, handles))})
+        if images:
+            media = [{"type": "photo", "media": f"attach://p{i}"} for i in range(len(images))]
+            media[0]["caption"] = f"🖼 {title}"
+            tg("sendMediaGroup", chat_id=chat_id, media=media,
+               files={f"p{i}": (p.name, h, "image/jpeg") for i, (p, h) in enumerate(zip(images, handles))})
     finally:
         for h in handles:
             h.close()
@@ -80,7 +81,7 @@ def send_request(folder: Path, chat_id):
         with open(reel, "rb") as v:
             tg("sendVideo", chat_id=chat_id, caption="🎬 릴스 미리보기", supports_streaming="true",
                files={"video": (reel.name, v, "video/mp4")})
-    what = f"카드 {len(images)}장" + (" + 릴스 1개" if reel else "")
+    what = " + ".join(filter(None, [f"카드 {len(images)}장" if images else "", "릴스 1개" if reel else ""]))
     text = (f"📮 결재 요청: {title}\n\n{post.get('caption', '')}\n\n"
             f"──────────\n위 {what}를 econ.insta에 게시할까요?")[:4000]
     msg = tg("sendMessage", chat_id=chat_id, text=text, reply_markup={"inline_keyboard": [[
