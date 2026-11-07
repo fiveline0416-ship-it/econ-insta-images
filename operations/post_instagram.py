@@ -9,7 +9,7 @@ posts/<게시물>/ 폴더에 있는 카드 이미지(JPEG)와 캡션을 인스�
     card_01.jpg ... card_06.jpg
 게시가 끝나면 같은 폴더에 published.json 을 남긴다 (중복 게시 방지).
 
-필요한 비밀값 (GitHub Secrets):  IG_ACCESS_TOKEN, IG_USER_ID
+필요한 비밀값 (GitHub → Environments → instagram 의 Secrets):  IG_ACCESS_TOKEN  (IG_USER_ID는 선택)
 비밀값이 없으면 '시험 모드'로 돌아서, 실제로 올리지 않고 무엇을 올릴지만 보여준다.
 """
 import json
@@ -29,7 +29,7 @@ TOKEN = os.environ.get("IG_ACCESS_TOKEN", "").strip()
 IG_ID = os.environ.get("IG_USER_ID", "").strip()
 REPO = os.environ.get("GITHUB_REPOSITORY", "fiveline0416-ship-it/econ-insta-images")
 SHA = os.environ.get("GITHUB_SHA", "main")
-DRY = not (TOKEN and IG_ID)
+DRY = not TOKEN
 
 
 def raw_url(path: Path) -> str:
@@ -86,7 +86,7 @@ def publish(folder: Path):
     print("   캡션 앞부분:", caption[:80].replace("\n", " "), "…")
 
     if DRY:
-        print("🧪 시험 모드: IG_ACCESS_TOKEN / IG_USER_ID 비밀값이 없어서 실제로 올리지 않았어요.")
+        print("🧪 시험 모드: IG_ACCESS_TOKEN 비밀값이 없어서 실제로 올리지 않았어요.")
         return None
 
     children = []
@@ -108,6 +108,12 @@ def publish(folder: Path):
 
 
 def main():
+    global IG_ID
+    if TOKEN and not IG_ID:
+        # IG_USER_ID 비밀값이 없으면 토큰으로 계정 번호를 직접 확인
+        me = call("GET", "me", fields="user_id,username")
+        IG_ID = str(me.get("user_id") or me.get("id"))
+        print(f"👤 게시 계정: @{me.get('username')} (ID {IG_ID})")
     only = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
     todo = pending_posts(only)
     if not todo:
