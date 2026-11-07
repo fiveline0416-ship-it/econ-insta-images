@@ -1,18 +1,16 @@
-# 경제 1분 · 운영팀 출근표
-# 디자인팀이 posts/ 폴더에 새 게시물을 올리면 시작 → 사장(OS) 승인을 기다림 → 승인하면 인스타그램에 게시.
-# 승인 없이는 절대 게시되지 않음 (Settings → Environments → instagram → Required reviewers).
-name: 운영팀 - 인스타 게시 (승인 필요)
+# 경제 1분 · 운영팀 출근표 — 텔레그램 결재 & 인스타 게시
+# - 디자인팀이 posts/ 에 새 게시물을 올리면: 텔레그램으로 카드·릴스·캡션 + [승인][거절] 버튼 전송
+# - 5분마다: 텔레그램 버튼을 확인해서, 운영자(OS)가 [승인]을 누른 게시물만 인스타그램에 게시
+# 운영자 버튼 없이는 절대 게시되지 않는다 (telegram_bot.py 가 운영자 채팅 ID를 확인).
+name: 운영팀 - 텔레그램 결재 & 인스타 게시
 
 on:
   push:
     branches: [main]
     paths: ["posts/**/post.json"]
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch:
-    inputs:
-      post:
-        description: "올릴 게시물 폴더 이름 (비우면 가장 오래된 대기 게시물)"
-        required: false
-        default: ""
 
 concurrency:
   group: instagram-publish
@@ -20,26 +18,13 @@ concurrency:
 
 permissions:
   contents: write
-  actions: read
 
 jobs:
-  publish:
+  operate:
     runs-on: ubuntu-latest
-    environment: instagram        # ← 여기서 사장 승인을 기다림
+    environment: instagram          # 인스타 열쇠(IG_ACCESS_TOKEN)가 들어 있는 금고
+    timeout-minutes: 30
     steps:
-      - name: 안전 확인 (승인자 지정 여부)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # instagram 환경에 '승인자(Required reviewers)'가 없으면 게시하지 않고 멈춘다
-          n=$(gh api "repos/${{ github.repository }}/environments/instagram" \
-                --jq '[.protection_rules[]? | select(.type=="required_reviewers")] | length' 2>/dev/null || echo 0)
-          if [ "$n" = "0" ]; then
-            echo "⛔ instagram 환경에 승인자가 지정되지 않았어요. Settings → Environments → instagram → Required reviewers 를 먼저 설정하세요."
-            exit 1
-          fi
-          echo "✅ 승인자 확인됨"
-
       - name: 사무실 문 열기
         uses: actions/checkout@v4
 
@@ -51,19 +36,20 @@ jobs:
       - name: 도구 설치
         run: pip install requests
 
-      - name: 인스타그램에 게시
+      - name: 텔레그램 결재 확인 · 게시
         env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID || '17841426810097346' }}   # econ.insta 계정 번호 (공개 정보)
-        run: python operations/post_instagram.py "${{ github.event.inputs.post }}"
+        run: python operations/telegram_bot.py
 
-      - name: 게시 기록 저장
+      - name: 기록 저장
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add posts/
+          for f in posts operations/telegram_config.json operations/telegram_state.json; do [ -e "$f" ] && git add "$f"; done
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "운영팀: 인스타그램 게시 기록"
+          git commit -m "운영팀: 텔레그램 결재 기록"
           for i in 1 2 3; do
             if git push; then exit 0; fi
             sleep $((i * 10)); git pull --rebase origin main || true
