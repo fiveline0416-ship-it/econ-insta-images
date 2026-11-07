@@ -20,12 +20,26 @@ concurrency:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: instagram        # ← 여기서 사장 승인을 기다림
     steps:
+      - name: 안전 확인 (승인자 지정 여부)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # instagram 환경에 '승인자(Required reviewers)'가 없으면 게시하지 않고 멈춘다
+          n=$(gh api "repos/${{ github.repository }}/environments/instagram" \
+                --jq '[.protection_rules[]? | select(.type=="required_reviewers")] | length' 2>/dev/null || echo 0)
+          if [ "$n" = "0" ]; then
+            echo "⛔ instagram 환경에 승인자가 지정되지 않았어요. Settings → Environments → instagram → Required reviewers 를 먼저 설정하세요."
+            exit 1
+          fi
+          echo "✅ 승인자 확인됨"
+
       - name: 사무실 문 열기
         uses: actions/checkout@v4
 
