@@ -1,0 +1,57 @@
+# 경제 1분 · 운영팀 출근표
+# 디자인팀이 posts/ 폴더에 새 게시물을 올리면 시작 → 사장(OS) 승인을 기다림 → 승인하면 인스타그램에 게시.
+# 승인 없이는 절대 게시되지 않음 (Settings → Environments → instagram → Required reviewers).
+name: 운영팀 - 인스타 게시 (승인 필요)
+
+on:
+  push:
+    branches: [main]
+    paths: ["posts/**/post.json"]
+  workflow_dispatch:
+    inputs:
+      post:
+        description: "올릴 게시물 폴더 이름 (비우면 가장 오래된 대기 게시물)"
+        required: false
+        default: ""
+
+concurrency:
+  group: instagram-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: instagram        # ← 여기서 사장 승인을 기다림
+    steps:
+      - name: 사무실 문 열기
+        uses: actions/checkout@v4
+
+      - name: 파이썬 준비
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 도구 설치
+        run: pip install requests
+
+      - name: 인스타그램에 게시
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python operations/post_instagram.py "${{ github.event.inputs.post }}"
+
+      - name: 게시 기록 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add posts/
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "운영팀: 인스타그램 게시 기록"
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            sleep $((i * 10)); git pull --rebase origin main || true
+          done
+          exit 1

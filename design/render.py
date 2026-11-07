@@ -1,6 +1,6 @@
 """
 경제 1분 · 디자인팀
-카드뉴스 원고(JSON)를 1080×1350 PNG 이미지로 만든다.
+카드뉴스 원고(JSON)를 1080×1350 PNG 이미지(+ 인스타 게시용 JPG)로 만든다.
 
 사용법:  python render.py 원고.json 결과폴더
 필요:    pip install playwright  /  npm i pretendard@1.3.9  (이 파일과 같은 폴더)
@@ -166,6 +166,9 @@ def render(spec_path, out_dir):
             shrunk = page.evaluate(FIT_JS)
             f = out / f"card_{i:02d}.png"
             page.screenshot(path=str(f), clip={"x": 0, "y": 0, "width": W, "height": H})
+            # 인스타그램 API는 JPEG만 받으므로 같은 그림을 .jpg로도 저장
+            page.screenshot(path=str(f.with_suffix(".jpg")), type="jpeg", quality=95,
+                            clip={"x": 0, "y": 0, "width": W, "height": H})
             tmp.unlink()
             files.append(f)
             print(f"🖼  {f.name}" + (f"  (글자 {shrunk}단계 줄임)" if shrunk else ""))
