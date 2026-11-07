@@ -21,11 +21,14 @@ from pathlib import Path
 
 import requests
 
-API = "https://graph.instagram.com/v25.0"
 ROOT = Path(__file__).resolve().parent.parent
 POSTS = ROOT / "posts"
 KST = timezone(timedelta(hours=9))
 TOKEN = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+# 열쇠 종류에 따라 주소가 다름: 인스타 로그인 열쇠(IG…) → graph.instagram.com,
+# 페이스북/통합 로그인 열쇠(EAA…) → graph.facebook.com
+FB_TOKEN = TOKEN.startswith("EAA")
+API = f"https://graph.{'facebook' if FB_TOKEN else 'instagram'}.com/v25.0"
 IG_ID = os.environ.get("IG_USER_ID", "").strip()
 REPO = os.environ.get("GITHUB_REPOSITORY", "fiveline0416-ship-it/econ-insta-images")
 SHA = os.environ.get("GITHUB_SHA", "main")
@@ -111,9 +114,16 @@ def main():
     global IG_ID
     if TOKEN and not IG_ID:
         # IG_USER_ID 비밀값이 없으면 토큰으로 계정 번호를 직접 확인
-        me = call("GET", "me", fields="user_id,username")
-        IG_ID = str(me.get("user_id") or me.get("id"))
-        print(f"👤 게시 계정: @{me.get('username')} (ID {IG_ID})")
+        if FB_TOKEN:
+            pages = call("GET", "me/accounts", fields="instagram_business_account{id,username}").get("data", [])
+            igs = [p["instagram_business_account"] for p in pages if p.get("instagram_business_account")]
+            if len(igs) != 1:
+                raise RuntimeError("인스타 계정 번호를 자동으로 못 찾았어요. instagram 환경에 IG_USER_ID 비밀값을 넣어주세요.")
+            IG_ID, name = igs[0]["id"], igs[0].get("username")
+        else:
+            me = call("GET", "me", fields="user_id,username")
+            IG_ID, name = str(me.get("user_id") or me.get("id")), me.get("username")
+        print(f"👤 게시 계정: @{name} (ID {IG_ID})")
     only = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] else None
     todo = pending_posts(only)
     if not todo:
