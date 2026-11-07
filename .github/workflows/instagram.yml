@@ -54,7 +54,7 @@ jobs:
       - name: 인스타그램에 게시
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID || '17841426810097346' }}   # econ.insta 계정 번호 (공개 정보)
         run: python operations/post_instagram.py "${{ github.event.inputs.post }}"
 
       - name: 게시 기록 저장
