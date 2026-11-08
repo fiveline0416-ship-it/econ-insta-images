@@ -1,8 +1,33 @@
 [
   {
     "name": "한국은행 BOK 이슈노트",
+    "parser": "bok",
     "list_url": "https://www.bok.or.kr/portal/singl/newsData/listCont.do?pageIndex=1&targetDepth=3&menuNo=200433&syncMenuChekKey=1&searchCnd=1&searchKwd=&depth2=201156&depth3=200433",
-    "base_url": "https://www.bok.or.kr",
-    "link_contains": "P0002353/view.do"
+    "base_url": "https://www.bok.or.kr"
+  },
+  {
+    "name": "KDI FOCUS",
+    "parser": "kdi",
+    "list_url": "https://www.kdi.re.kr/research/focusList",
+    "base_url": "https://www.kdi.re.kr"
+  },
+  {
+    "name": "KIEP 세계경제 포커스",
+    "parser": "kiep",
+    "list_url": "https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004",
+    "base_url": "https://www.kiep.go.kr"
+  },
+  {
+    "name": "자본시장연구원 이슈보고서",
+    "parser": "kcmi",
+    "list_url": "https://www.kcmi.re.kr/report/report_list?s_report_type=002002002013",
+    "base_url": "https://www.kcmi.re.kr"
+  },
+  {
+    "name": "국가데이터처 보도자료",
+    "parser": "mods",
+    "list_url": "https://www.mods.go.kr/menu.es?mid=a10301010000",
+    "base_url": "https://www.mods.go.kr",
+    "include": ["소비자물가동향", "고용동향", "경제활동인구조사", "산업활동동향", "가계동향", "인구동향", "출생", "가계금융복지", "소득분배", "생산자물가", "온라인쇼핑동향", "서비스업동향", "장래인구", "혼인", "사회조사", "청년", "고령자 통계"]
   }
 ]
