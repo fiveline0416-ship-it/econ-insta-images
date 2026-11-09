@@ -60,7 +60,7 @@
   "title": "2026년 9월 산업활동동향",
   "date": "2026-10-30",
   "url": "https://www.mods.go.kr/board.es?mid=a10301010000&bid=216&act=view&list_no=447747",
-  "doc": null,
+  "doc": "docs/mods-447747.md",
   "evergreen": false
  },
  "11065979": {
@@ -92,7 +92,7 @@
   "title": "최근 대러제재 예외 사례와 정책 시사점",
   "date": "2026-10-21",
   "url": "https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12660",
-  "doc": null,
+  "doc": "docs/kiep-12660.md",
   "evergreen": false
  },
  "kiep-12644": {
@@ -100,7 +100,7 @@
   "title": "캐나다의 수출 다변화 전략 추진 배경과 시사점",
   "date": "2026-10-14",
   "url": "https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12644",
-  "doc": null,
+  "doc": "docs/kiep-12644.md",
   "evergreen": false
  },
  "kcmi-2337": {
@@ -326,7 +326,7 @@
   "title": "[제2025-29호] 고빈도 데이터를 통해 본, 날씨 및 요일의 소비 영향",
   "date": "2025-09-29",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10093753&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10093753.md",
   "evergreen": true,
   "why": "'비 오는 날엔 덜 쓸까?' 재미있는 데이터 이야기"
  },
@@ -344,7 +344,7 @@
   "title": "[제2025-14호] 일본경제로부터 되새겨볼 교훈",
   "date": "2025-06-05",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10091764&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10091764.md",
   "evergreen": true,
   "why": "잃어버린 30년에서 배우는 교훈, 시대를 타지 않는 비교 주제"
  },
@@ -389,7 +389,7 @@
   "title": "[제2024-31호] 최근 1인 가구 확산의 경제적 영향 평가",
   "date": "2024-12-03",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10088369&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10088369.md",
   "evergreen": true,
   "why": "1인 가구 소비·주거 변화, 독자 공감도 높음"
  },
