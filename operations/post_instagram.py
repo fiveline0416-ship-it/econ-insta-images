@@ -43,7 +43,11 @@ def now():
 
 def raw_url(path: Path) -> str:
     rel = path.relative_to(ROOT).as_posix()
-    return f"https://raw.githubusercontent.com/{REPO}/{SHA}/{rel}"
+    # 그 파일을 올린 커밋 주소를 쓴다 (운영팀이 대기 중에 새로 받아온 게시물도 깃허브에 있는 주소로)
+    import subprocess
+    sha = subprocess.run(["git", "log", "-1", "--format=%H", "--", rel], cwd=ROOT,
+                         capture_output=True, text=True).stdout.strip() or SHA
+    return f"https://raw.githubusercontent.com/{REPO}/{sha}/{rel}"
 
 
 def call(method, endpoint, **params):

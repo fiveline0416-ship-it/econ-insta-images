@@ -11,7 +11,9 @@
 """
 import json
 import os
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -24,6 +26,7 @@ CONFIG = HERE / "telegram_config.json"   # {"chat_id": ..., "name": "..."}
 STATE = HERE / "telegram_state.json"     # {"offset": 마지막으로 처리한 update_id}
 POSTS = ig.POSTS
 BOT = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+LOOP = int(os.environ.get("LOOP_SECONDS", "0") or 0)   # 0이면 한 번만 확인, 아니면 그 시간 동안 계속 대기
 API = f"https://api.telegram.org/bot{BOT}"
 
 
@@ -31,7 +34,7 @@ def tg(method, files=None, **params):
     for k, v in list(params.items()):
         if isinstance(v, (dict, list)):
             params[k] = json.dumps(v, ensure_ascii=False)
-    r = requests.post(f"{API}/{method}", data=params, files=files, timeout=120)
+    r = requests.post(f"{API}/{method}", data=params, files=files, timeout=180)
     body = r.json()
     if not body.get("ok"):
         raise RuntimeError(f"텔레그램 오류 ({method}): {body.get('description')}")
@@ -118,8 +121,9 @@ def handle_callback(q, cfg):
         return
     action, _, name = data.partition(":")
     folder = POSTS / name
-    if not name or not folder.is_dir() or "/" in name or ".." in name:
+    if not name or "/" in name or ".." in name or not folder.is_dir():
         answer(q, "게시물을 찾을 수 없어요.")
+        print(f"   ↳ 게시물 폴더 없음: {name}")
         return
 
     def update(text):
@@ -130,6 +134,7 @@ def handle_callback(q, cfg):
     if (folder / "rejected.json").exists() or ((folder / "published.json").exists()
                                               and not load(folder / "published.json", {}).get("reel_error")):
         answer(q, "이미 처리된 게시물이에요.")
+        print(f"   ↳ 이미 처리된 게시물: {name}")
         return
     if action == "no":
         save(folder / "rejected.json", {"rejected_at": ig.now()})
@@ -162,11 +167,22 @@ def handle_callback(q, cfg):
     print(f"✅ 처리: {name} → {r}")
 
 
-def poll():
+def describe(u):
+    if "callback_query" in u:
+        q = u["callback_query"]
+        return f"버튼 '{q.get('data')}' (누른 사람 {q['from']['id']})"
+    if "message" in u:
+        m = u["message"]
+        return f"메시지 '{(m.get('text') or '')[:30]}' (보낸 사람 {m['chat']['id']})"
+    return f"기타 {list(u)}"
+
+
+def poll(wait=0):
     cfg, state = load(CONFIG, {}), load(STATE, {"offset": 0})
-    updates = tg("getUpdates", offset=state["offset"] + 1, timeout=0,
+    updates = tg("getUpdates", offset=state["offset"] + 1, timeout=wait,
                  allowed_updates=["message", "callback_query"])
     for u in updates:
+        print(f"📥 받음: {describe(u)}")
         try:
             if "message" in u:
                 handle_message(u["message"], cfg)
@@ -176,7 +192,42 @@ def poll():
             print(f"⚠️ 처리 중 오류 (update {u['update_id']}): {e}")
         state["offset"] = u["update_id"]
         save(STATE, state)   # 한 건씩 저장 → 같은 버튼을 두 번 처리하지 않음
-    return cfg
+    return cfg, bool(updates)
+
+
+def git(*args):
+    return subprocess.run(["git", *args], cwd=ig.ROOT, capture_output=True, text=True)
+
+
+def sync():
+    """기록(결재·게시 결과)을 깃허브에 저장하고, 디자인팀이 새로 올린 게시물을 받아온다."""
+    if not LOOP:
+        return
+    for f in ("posts", "operations/telegram_config.json", "operations/telegram_state.json"):
+        if (ig.ROOT / f).exists():
+            git("add", f)
+    if git("diff", "--cached", "--quiet").returncode:
+        git("commit", "-q", "-m", "운영팀: 텔레그램 결재 기록")
+    for _ in range(3):
+        git("pull", "-q", "--rebase", "origin", "main")
+        if git("push", "-q", "origin", "HEAD:main").returncode == 0:
+            return
+        time.sleep(5)
+    print("⚠️ 기록 저장(push) 실패 — 다음 확인 때 다시 시도해요")
+
+
+def send_pending(chat_id):
+    if not POSTS.exists():
+        return False
+    sent = False
+    for folder in sorted(p for p in POSTS.iterdir() if p.is_dir()):
+        if needs_request(folder):
+            try:
+                send_request(folder, chat_id)
+                sent = True
+            except Exception as e:
+                print(f"⚠️ 결재 요청 실패: {folder.name} — {e}")
+    return sent
 
 
 def main():
@@ -184,19 +235,25 @@ def main():
         print("TELEGRAM_BOT_TOKEN 비밀값이 없어서 텔레그램 결재를 건너뛰어요.")
         return
     me = tg("getMe")
-    print(f"🤖 연결된 봇: @{me.get('username')} ({me.get('first_name')})")
-    cfg = poll()
-    chat_id = cfg.get("chat_id")
-    if not chat_id:
-        print("ℹ️ 아직 운영자가 등록되지 않았어요. 텔레그램에서 봇에게 /start 를 보내주세요.")
-        return
-    if POSTS.exists():
-        for folder in sorted(p for p in POSTS.iterdir() if p.is_dir()):
-            if needs_request(folder):
-                try:
-                    send_request(folder, chat_id)
-                except Exception as e:
-                    print(f"⚠️ 결재 요청 실패: {folder.name} — {e}")
+    print(f"🤖 연결된 봇: @{me.get('username')} ({me.get('first_name')})"
+          + (f" — {LOOP // 60}분 동안 대기하며 버튼을 바로 처리해요" if LOOP else ""))
+    end = time.time() + LOOP
+    last_pull = 0
+    while True:
+        cfg, got = poll(wait=20 if LOOP else 0)
+        chat_id = cfg.get("chat_id")
+        if not chat_id:
+            print("ℹ️ 아직 운영자가 등록되지 않았어요. 텔레그램에서 봇에게 /start 를 보내주세요.")
+        changed = got
+        if LOOP and time.time() - last_pull > 60:   # 1분마다 디자인팀의 새 게시물 확인
+            git("pull", "-q", "--rebase", "origin", "main")
+            last_pull = time.time()
+        if chat_id and send_pending(chat_id):
+            changed = True
+        if changed:
+            sync()
+        if time.time() >= end:
+            break
 
 
 if __name__ == "__main__":
