@@ -50,6 +50,7 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID || '17841426810097346' }}   # econ.insta 계정 번호 (공개 정보)
           LOOP_SECONDS: "1500"   # 25분 대기
+          PYTHONUNBUFFERED: "1"  # 기록이 실시간으로 보이게
         run: python operations/telegram_bot.py
 
       - name: 기록 저장
