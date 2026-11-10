@@ -50,25 +50,33 @@ def raw_url(path: Path) -> str:
     return f"https://raw.githubusercontent.com/{REPO}/{sha}/{rel}"
 
 
-def call(method, endpoint, **params):
+def call(method, endpoint, _retry=3, **params):
     params["access_token"] = TOKEN
     r = requests.request(method, f"{API}/{endpoint}", data=params if method == "POST" else None,
                          params=params if method == "GET" else None, timeout=120)
     body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {"raw": r.text}
     if r.status_code >= 400 or "error" in body:
-        msg = body.get("error", {}).get("message", body)
+        err = body.get("error", {}) if isinstance(body.get("error"), dict) else {}
+        msg = err.get("message", body)
+        # 호출 한도 초과(code 4·17·32·613)는 잠깐 쉬었다가 다시 시도
+        if _retry and (err.get("code") in (4, 17, 32, 613) or "limit" in str(msg).lower()):
+            wait = 120 * (4 - _retry)
+            print(f"   ⏸ 인스타 호출 한도 — {wait}초 쉬고 다시 시도 ({endpoint})")
+            time.sleep(wait)
+            params.pop("access_token", None)
+            return call(method, endpoint, _retry=_retry - 1, **params)
         raise RuntimeError(f"인스타그램 API 오류 ({endpoint}): {msg}")
     return body
 
 
 def wait_ready(container_id, label, tries=20, every=15):
     for _ in range(tries):
+        time.sleep(every)   # 바로 묻지 않고 먼저 기다림 → 호출 수 절약
         st = call("GET", container_id, fields="status_code").get("status_code")
         if st == "FINISHED":
             return
         if st in ("ERROR", "EXPIRED"):
             raise RuntimeError(f"{label} 준비 실패: {st}")
-        time.sleep(every)
     raise RuntimeError(f"{label} 준비 시간 초과")
 
 
@@ -109,14 +117,12 @@ def load_post(folder: Path):
 
 def post_carousel(images, caption):
     children = []
-    for i, p in enumerate(images, 1):
-        cid = call("POST", f"{IG_ID}/media", image_url=raw_url(p), is_carousel_item="true")["id"]
-        wait_ready(cid, f"{i}장")
-        children.append(cid)
-        print(f"   ✅ {i}장 준비 완료")
+    for i, p in enumerate(images, 1):   # 사진은 금방 준비되므로 장마다 기다리지 않음
+        children.append(call("POST", f"{IG_ID}/media", image_url=raw_url(p), is_carousel_item="true")["id"])
+        print(f"   ✅ {i}장 올림")
     carousel = call("POST", f"{IG_ID}/media", media_type="CAROUSEL",
                     children=",".join(children), caption=caption)["id"]
-    wait_ready(carousel, "캐러셀")
+    wait_ready(carousel, "캐러셀", every=10)
     media_id = call("POST", f"{IG_ID}/media_publish", creation_id=carousel)["id"]
     return media_id, call("GET", media_id, fields="permalink").get("permalink")
 
