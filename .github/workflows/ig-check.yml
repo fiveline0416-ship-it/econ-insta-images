@@ -1,0 +1,16 @@
+# 운영팀 점검: 최근 게시물·호출 한도 확인 (게시하지 않음)
+name: 운영팀 - 인스타 점검
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    environment: instagram
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install requests
+      - env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python operations/ig_check.py
