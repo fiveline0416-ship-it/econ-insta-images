@@ -115,6 +115,33 @@ def load_post(folder: Path):
     return post, images, reel
 
 
+def publish_container(cid, caption, kind):
+    """media_publish 를 부른다. 인스타가 오류를 내도 실제로는 올라간 경우가 있어서, 최근 게시물에서 한 번 더 확인한다."""
+    try:
+        media_id = call("POST", f"{IG_ID}/media_publish", creation_id=cid)["id"]
+        return media_id, call("GET", media_id, fields="permalink").get("permalink")
+    except Exception as e:
+        print(f"   ⚠️ 게시 단계 오류, 실제로 올라갔는지 확인해요: {e}")
+        time.sleep(20)
+        found = find_recent(caption, kind)
+        if found:
+            print("   ✅ 확인해보니 이미 올라가 있어요")
+            return found
+        raise
+
+
+def find_recent(caption, kind, minutes=30):
+    """최근 게시물 중 같은 캡션·종류(CAROUSEL_ALBUM / VIDEO)가 있으면 (id, 주소)를 돌려준다."""
+    data = call("GET", f"{IG_ID}/media", fields="id,caption,media_type,timestamp,permalink", limit=10).get("data", [])
+    head = caption.strip()[:60]
+    for m in data:
+        ts = datetime.strptime(m["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
+        if (m.get("media_type") == kind and (m.get("caption") or "").strip()[:60] == head
+                and datetime.now(timezone.utc) - ts < timedelta(minutes=minutes)):
+            return m["id"], m.get("permalink")
+    return None
+
+
 def post_carousel(images, caption):
     children = []
     for i, p in enumerate(images, 1):   # 사진은 금방 준비되므로 장마다 기다리지 않음
@@ -123,8 +150,7 @@ def post_carousel(images, caption):
     carousel = call("POST", f"{IG_ID}/media", media_type="CAROUSEL",
                     children=",".join(children), caption=caption)["id"]
     wait_ready(carousel, "캐러셀", every=10)
-    media_id = call("POST", f"{IG_ID}/media_publish", creation_id=carousel)["id"]
-    return media_id, call("GET", media_id, fields="permalink").get("permalink")
+    return publish_container(carousel, caption, "CAROUSEL_ALBUM")
 
 
 def post_reel(video: Path, caption):
@@ -144,8 +170,7 @@ def post_reel(video: Path, caption):
                    caption=caption, share_to_feed="true")["id"]
     print("   ⏳ 릴스 영상 처리 중 (몇 분 걸릴 수 있어요)")
     wait_ready(cid, "릴스", tries=40, every=15)   # 최대 약 10분
-    media_id = call("POST", f"{IG_ID}/media_publish", creation_id=cid)["id"]
-    return media_id, call("GET", media_id, fields="permalink").get("permalink")
+    return publish_container(cid, caption, "VIDEO")
 
 
 def publish(folder: Path):

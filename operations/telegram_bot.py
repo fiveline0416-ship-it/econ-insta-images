@@ -63,8 +63,10 @@ def owner():
 
 # ── 1) 결재 요청 보내기 ─────────────────────────────────────────
 def needs_request(folder: Path):
-    return ((folder / "post.json").exists() and not any(
-        (folder / f).exists() for f in ("request.json", "published.json", "rejected.json")))
+    if not (folder / "post.json").exists() or any((folder / f).exists() for f in ("request.json", "rejected.json")):
+        return False
+    done = load(folder / "published.json", None)
+    return done is None or bool(done.get("reel_error"))   # 릴스만 실패한 경우도 다시 결재 요청
 
 
 def send_request(folder: Path, chat_id):
