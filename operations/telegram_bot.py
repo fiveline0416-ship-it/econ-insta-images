@@ -126,10 +126,12 @@ def handle_callback(q, cfg):
         print(f"   ↳ 게시물 폴더 없음: {name}")
         return
 
-    def update(text):
+    def update(text, keep_buttons=False):
+        # 텔레그램은 글을 고치면 버튼이 사라지므로, 재시도가 필요할 땐 버튼을 다시 붙인다
         if msg:
+            extra = {"reply_markup": msg["reply_markup"]} if keep_buttons and msg.get("reply_markup") else {}
             tg("editMessageText", chat_id=msg["chat"]["id"], message_id=msg["message_id"],
-               text=(msg.get("text", "") + "\n\n" + text)[:4000])
+               text=(msg.get("text", "") + "\n\n" + text)[:4000], **extra)
 
     if (folder / "rejected.json").exists() or ((folder / "published.json").exists()
                                               and not load(folder / "published.json", {}).get("reel_error")):
@@ -148,7 +150,7 @@ def handle_callback(q, cfg):
     try:
         r = ig.publish(folder)
     except Exception as e:
-        update(f"⚠️ 게시 실패: {str(e)[:300]}\n(다시 [✅ 승인]을 누르면 재시도해요)")
+        update(f"⚠️ 게시 실패: {str(e)[:300]}\n(다시 [✅ 승인]을 누르면 재시도해요)", keep_buttons=True)
         print(f"⚠️ 게시 실패: {name} — {e}")
         return
     lines = ["✅ 승인 완료"]
@@ -163,7 +165,7 @@ def handle_callback(q, cfg):
     if msg and not r.get("reel_error"):
         tg("editMessageReplyMarkup", chat_id=msg["chat"]["id"], message_id=msg["message_id"],
            reply_markup={"inline_keyboard": []})
-    update("\n".join(lines))
+    update("\n".join(lines), keep_buttons=bool(r.get("reel_error")))
     print(f"✅ 처리: {name} → {r}")
 
 
