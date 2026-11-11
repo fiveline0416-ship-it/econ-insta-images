@@ -4,6 +4,8 @@
 
 | 발간일 | 기관 | 제목 | 상태 |
 |---|---|---|---|
+| 2026-11-11 | 국가데이터처 보도자료 | [2026년 10월 고용동향](https://www.mods.go.kr/board.es?mid=a10301010000&bid=210&act=view&list_no=447893) | 대기 |
+| 2026-11-10 | KIEP 세계경제 포커스 | [글로벌 불균형의 구조 변화와 한국의 대응](https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12686) | 대기 |
 | 2026-11-05 | KIEP 세계경제 포커스 | [최근 프랑스 시위의 주요 쟁점과 시사점](https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12677) | 대기 |
 | 2026-11-04 | 국가데이터처 보도자료 | [2026년 8월 경제활동인구조사 비임금근로 및 비경제활동인구 부가조사 결과](https://www.mods.go.kr/board.es?mid=a10301010000&bid=210&act=view&list_no=447820) | 대기 |
 | 2026-11-03 | 국가데이터처 보도자료 | [2026년 10월 소비자물가동향](https://www.mods.go.kr/board.es?mid=a10301010000&bid=213&act=view&list_no=447801) | 대기 |

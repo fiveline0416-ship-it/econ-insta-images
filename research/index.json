@@ -1,4 +1,20 @@
 {
+ "mods-447893": {
+  "source": "국가데이터처 보도자료",
+  "title": "2026년 10월 고용동향",
+  "date": "2026-11-11",
+  "url": "https://www.mods.go.kr/board.es?mid=a10301010000&bid=210&act=view&list_no=447893",
+  "doc": "docs/mods-447893.md",
+  "evergreen": false
+ },
+ "kiep-12686": {
+  "source": "KIEP 세계경제 포커스",
+  "title": "글로벌 불균형의 구조 변화와 한국의 대응",
+  "date": "2026-11-10",
+  "url": "https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12686",
+  "doc": "docs/kiep-12686.md",
+  "evergreen": false
+ },
  "kiep-12677": {
   "source": "KIEP 세계경제 포커스",
   "title": "최근 프랑스 시위의 주요 쟁점과 시사점",
@@ -380,7 +396,7 @@
   "title": "[제2024-33호] 우리 경제의 잠재성장률과 향후 전망",
   "date": "2024-12-19",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10088713&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10088713.md",
   "evergreen": true,
   "why": "잠재성장률 개념 설명용 교과서 같은 보고서"
  },
@@ -416,7 +432,7 @@
   "title": "[제2024-16호] 컴퓨터 관련 여가(recreational computing)와 노동공급",
   "date": "2024-06-28",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10085475&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10085475.md",
   "evergreen": true,
   "why": "게임·인터넷 여가와 일하는 시간, 의외성 있는 주제"
  },
@@ -434,7 +450,7 @@
   "title": "[제2024-13호] 노동시장에서 사회적 능력의 중요성 증가",
   "date": "2024-06-10",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10084568&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10084568.md",
   "evergreen": true,
   "why": "소통·협업 능력이 임금에 주는 영향, 직장인 공감 주제"
  },
