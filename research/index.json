@@ -7,6 +7,14 @@
   "doc": "docs/mods-447893.md",
   "evergreen": false
  },
+ "kcmi-2350": {
+  "source": "자본시장연구원 이슈보고서",
+  "title": "투자판단에서의 핀플루언서 의존 실태와 규제 방안",
+  "date": "2026-11-11",
+  "url": "https://www.kcmi.re.kr/report/report_view?report_no=2350",
+  "doc": "docs/kcmi-2350.md",
+  "evergreen": false
+ },
  "kiep-12686": {
   "source": "KIEP 세계경제 포커스",
   "title": "글로벌 불균형의 구조 변화와 한국의 대응",
@@ -369,7 +377,7 @@
   "title": "[제2025-12호] 늘어나는 고령 자영업자, 그 이유와 대응 방안",
   "date": "2025-05-15",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10091405&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10091405.md",
   "evergreen": true,
   "why": "고령 자영업 증가 배경, 생활 밀착 주제"
  },
@@ -423,7 +431,7 @@
   "title": "[제2024-17호] 2차 베이비부머의 은퇴연령 진입에 따른 경제적 영향 평가",
   "date": "2024-07-01",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10085515&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10085515.md",
   "evergreen": true,
   "why": "954만 명 은퇴가 경제에 주는 영향, 장기 구조 주제"
  },
@@ -486,7 +494,7 @@
   "title": "[제2022-19호] 자산으로서 우리나라 주택의 특징 및 시사점",
   "date": "2022-05-23",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10070647&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10070647.md",
   "evergreen": true,
   "why": "가계 자산에서 주택 쏠림, 구조적 특징 (발간 시점 데이터 표기)"
  },

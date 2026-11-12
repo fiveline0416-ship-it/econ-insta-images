@@ -4,6 +4,7 @@
 
 | 발간일 | 기관 | 제목 | 상태 |
 |---|---|---|---|
+| 2026-11-11 | 자본시장연구원 이슈보고서 | [투자판단에서의 핀플루언서 의존 실태와 규제 방안](https://www.kcmi.re.kr/report/report_view?report_no=2350) | 대기 |
 | 2026-11-11 | 국가데이터처 보도자료 | [2026년 10월 고용동향](https://www.mods.go.kr/board.es?mid=a10301010000&bid=210&act=view&list_no=447893) | 대기 |
 | 2026-11-10 | KIEP 세계경제 포커스 | [글로벌 불균형의 구조 변화와 한국의 대응](https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12686) | 대기 |
 | 2026-11-05 | KIEP 세계경제 포커스 | [최근 프랑스 시위의 주요 쟁점과 시사점](https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12677) | 대기 |
