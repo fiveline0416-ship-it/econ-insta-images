@@ -467,7 +467,7 @@
   "title": "[제2024-1호] 미혼인구 증가와 노동공급 장기추세",
   "date": "2024-01-08",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10081620&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10081620.md",
   "evergreen": true,
   "why": "미혼 증가가 노동시장에 주는 장기 영향"
  },
@@ -476,7 +476,7 @@
   "title": "[제2023-32호] OECD 국가별 패널 자료를 통한 우리나라 저출산 원인 및 정책 효과 분석",
   "date": "2023-12-07",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10080994&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10080994.md",
   "evergreen": true,
   "why": "저출산 원인을 국가 비교로 (정책 평가는 균형 유의)"
  },
@@ -485,7 +485,7 @@
   "title": "[제2023-29호] 지역간 인구이동과 지역경제",
   "date": "2023-11-02",
   "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=10080338&menuNo=200433",
-  "doc": null,
+  "doc": "docs/10080338.md",
   "evergreen": true,
   "why": "수도권 집중, 청년 이동의 구조적 원인"
  },
