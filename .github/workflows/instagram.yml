@@ -1,6 +1,6 @@
 # 경제 1분 · 운영팀 출근표 — 텔레그램 결재 & 인스타 게시
 # - 디자인팀이 posts/ 에 새 게시물을 올리면: 텔레그램으로 카드·릴스·캡션 + [승인][거절] 버튼 전송
-# - 한 번 출근하면 25분 동안 자리를 지키며 버튼을 바로 처리 (깃허브 예약 실행은 30분쯤 간격이라 빈틈을 메움)
+# - 한 번 출근하면 55분 동안 자리를 지키며 버튼을 바로 처리 (깃허브 예약 실행은 30분쯤 간격이라 빈틈을 메움)
 #   운영자(OS)가 [승인]을 누른 게시물만 인스타그램에 게시
 # 운영자 버튼 없이는 절대 게시되지 않는다 (telegram_bot.py 가 운영자 채팅 ID를 확인).
 name: 운영팀 - 텔레그램 결재 & 인스타 게시
@@ -24,7 +24,7 @@ jobs:
   operate:
     runs-on: ubuntu-latest
     environment: instagram          # 인스타 열쇠(IG_ACCESS_TOKEN)가 들어 있는 금고
-    timeout-minutes: 40
+    timeout-minutes: 70
     steps:
       - name: 사무실 문 열기
         uses: actions/checkout@v4
@@ -49,7 +49,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID || '17841426810097346' }}   # econ.insta 계정 번호 (공개 정보)
-          LOOP_SECONDS: "1500"   # 25분 대기
+          LOOP_SECONDS: "3300"   # 55분 대기 (예약 실행 간격이 들쭉날쭉해서 빈틈 없게)
           PYTHONUNBUFFERED: "1"  # 기록이 실시간으로 보이게
         run: python operations/telegram_bot.py
 
