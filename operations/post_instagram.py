@@ -153,7 +153,19 @@ def post_carousel(images, caption):
     return publish_container(carousel, caption, "CAROUSEL_ALBUM")
 
 
-def post_reel(video: Path, caption):
+def post_reel(video: Path, caption, attempts=3):
+    """릴스는 인스타 쪽 영상 처리가 가끔 일시적으로 실패해서, 새로 올려 최대 3번 시도한다."""
+    for n in range(1, attempts + 1):
+        try:
+            return _post_reel_once(video, caption)
+        except Exception as e:
+            if n == attempts:
+                raise
+            print(f"   🔁 릴스 {n}번째 시도 실패, 1분 뒤 다시 올려요: {str(e)[:150]}")
+            time.sleep(60)
+
+
+def _post_reel_once(video: Path, caption):
     if FB_TOKEN:
         # 영상 파일을 직접 올리는 방식 (주소로 받아가는 방식보다 안정적)
         c = call("POST", f"{IG_ID}/media", media_type="REELS", upload_type="resumable",
