@@ -4,6 +4,8 @@
 
 | 발간일 | 기관 | 제목 | 상태 |
 |---|---|---|---|
+| 2026-11-17 | 한국은행 BOK 이슈노트 | [\[제2026-29호\] AI 확산과 생산성 효과: 더 널리, 더 효율적으로, 그러나 아직 얕게](https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=11066699&menuNo=200433) | 대기 |
+| 2026-11-17 | 국가데이터처 보도자료 | [국가데이터처, 제10회 저출생·고령화 국제 심포지엄 개최](https://www.mods.go.kr/board.es?mid=a10301010000&bid=11825&act=view&list_no=447964) | 대기 |
 | 2026-11-11 | 자본시장연구원 이슈보고서 | [투자판단에서의 핀플루언서 의존 실태와 규제 방안](https://www.kcmi.re.kr/report/report_view?report_no=2350) | 대기 |
 | 2026-11-11 | 국가데이터처 보도자료 | [2026년 10월 고용동향](https://www.mods.go.kr/board.es?mid=a10301010000&bid=210&act=view&list_no=447893) | 대기 |
 | 2026-11-10 | KIEP 세계경제 포커스 | [글로벌 불균형의 구조 변화와 한국의 대응](https://www.kiep.go.kr/gallery.es?mid=a10102030000&bid=0004&act=view&list_no=12686) | 대기 |

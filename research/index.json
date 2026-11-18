@@ -1,4 +1,20 @@
 {
+ "11066699": {
+  "source": "한국은행 BOK 이슈노트",
+  "title": "[제2026-29호] AI 확산과 생산성 효과: 더 널리, 더 효율적으로, 그러나 아직 얕게",
+  "date": "2026-11-17",
+  "url": "https://www.bok.or.kr/portal/bbs/P0002353/view.do?nttId=11066699&menuNo=200433",
+  "doc": "docs/11066699.md",
+  "evergreen": false
+ },
+ "mods-447964": {
+  "source": "국가데이터처 보도자료",
+  "title": "국가데이터처, 제10회 저출생·고령화 국제 심포지엄 개최",
+  "date": "2026-11-17",
+  "url": "https://www.mods.go.kr/board.es?mid=a10301010000&bid=11825&act=view&list_no=447964",
+  "doc": "docs/mods-447964.md",
+  "evergreen": false
+ },
  "mods-447893": {
   "source": "국가데이터처 보도자료",
   "title": "2026년 10월 고용동향",
