@@ -1,4 +1,12 @@
 {
+ "mods-447970": {
+  "source": "국가데이터처 보도자료",
+  "title": "2026년 사회조사 결과(가족, 교육과 훈련, 건강, 범죄와 안전, 생활환경)",
+  "date": "2026-11-18",
+  "url": "https://www.mods.go.kr/board.es?mid=a10301010000&bid=219&act=view&list_no=447970",
+  "doc": "docs/mods-447970.md",
+  "evergreen": false
+ },
  "11066699": {
   "source": "한국은행 BOK 이슈노트",
   "title": "[제2026-29호] AI 확산과 생산성 효과: 더 널리, 더 효율적으로, 그러나 아직 얕게",
