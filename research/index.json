@@ -1,4 +1,12 @@
 {
+ "mods-448110": {
+  "source": "국가데이터처 보도자료",
+  "title": "2026년 3/4분기 가계동향조사 결과 보도자료",
+  "date": "2026-11-26",
+  "url": "https://www.mods.go.kr/board.es?mid=a10301010000&bid=214&act=view&list_no=448110",
+  "doc": "docs/mods-448110.md",
+  "evergreen": false
+ },
  "kcmi-2356": {
   "source": "자본시장연구원 이슈보고서",
   "title": "K-자본시장 정책시리즈 3: ETF 시대 자산운용시장의 과제",
